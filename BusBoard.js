@@ -5,9 +5,9 @@ import fetch from 'node-fetch';
 const readline = require('readline')
 
 const rl = readline.createInterface({
-    input: process.stdin
+    input: process.stdin,
     output: process.stdout
-})
+});
 
 rl.question('Enter the bus stop code: ', (stopCode) => {
     console.log(`You entered bus stop code: ${stopCode}`);
@@ -23,14 +23,14 @@ async function busBoard() {
     const dataArray = [];
     let counter = 0;
 
-    for (let i = 0; i < data.length; i++) {
-        console.log(`Bus ${data[i].lineName} is arriving in ${data[i].timeToStation} seconds.`)
-        dataArray.push([data[i].lineName, data[i].timeToStation])
-    }
-
-    counter++;
-    if (counter === 5){
-        break;
+        for (let i = 0; i < data.length; i++) {
+           console.log(`Bus ${data[i].lineName} is arriving in ${data[i].timeToStation} seconds.`)
+           dataArray.push([data[i].lineName, data[i].timeToStation])
+        
+           counter++;
+           if (counter === 5){
+           break;
+        }
     }
 
     dataArray.sort(function(a,b) {
