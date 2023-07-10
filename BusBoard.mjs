@@ -35,16 +35,23 @@ async function busBoard() {
         stopIDs.push(stopsData.stopPoints[i].id)
     };
 
-    stopIDs.forEach(stopID => getArrivals(stopID));
-    console.log(stopIDs);
+
+    for (let i = 0; i < stopIDs.length; i++) {
+        getArrivals(stopIDs[i]);
+    }
+
     async function getArrivals(stopID) {
         const arrivalsUrl = `https://api.tfl.gov.uk/StopPoint/${stopID}/Arrivals`
         const arrivalsResponse = await fetch(arrivalsUrl);
         const arrivalsData = await arrivalsResponse.json();
 
-        console.log(arrivalsData);
+        if (arrivalsData.length === 0) {
+            console.log(`No arrivals returned for station ID ${stopID}`);
+        } else {
+            console.log(arrivalsData[0].stationName);
+        }
 
-        console.log(arrivalsData[0].stationName);
+        
         const dataArray = [];
         let counter = 0;
 
