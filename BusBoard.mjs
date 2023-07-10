@@ -1,20 +1,9 @@
 import fetch from 'node-fetch';
+import prompt from 'prompt-sync';
 
-// Get StopCode
+const promptSync = prompt();
 
-import readline from 'readline';
-
-const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
-});
-
-
-// rl.question('Enter a postcode: ', (postCode) => {
-//     console.log(`You entered postcode: ${postCode}`);
-    
-//    const url = `https://api.tfl.gov.uk/StopPoint/${stopCode}/Arrivals?s`
-const postCode = "wc2b5nt"  ;
+const postCode = promptSync('Enter a postcode: ');
 
 async function busBoard() {
     const postCodeUrl = `https://api.postcodes.io/postcodes/${postCode}`;
@@ -77,8 +66,5 @@ async function busBoard() {
 }
 
 busBoard();
-    
-rl.close();
-    console.log(postCode)
-//   });
+
 
