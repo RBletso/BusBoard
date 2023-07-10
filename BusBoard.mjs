@@ -9,20 +9,46 @@ const rl = readline.createInterface({
     output: process.stdout
 });
 
-rl.question('Enter the bus stop code: ', (stopCode) => {
-    console.log(`You entered bus stop code: ${stopCode}`);
+
+rl.question('Enter a postcode: ', (postCode) => {
+    console.log(`You entered postcode: ${postCode}`);
     
-    const url = `https://api.tfl.gov.uk/StopPoint/${stopCode}/Arrivals?s`
+//    const url = `https://api.tfl.gov.uk/StopPoint/${stopCode}/Arrivals?s`
+    
 
 async function busBoard() {
-    const response = await fetch(url);
-    const data = await response.json();
+    const postCodeUrl = `https://api.postcodes.io/postcodes/${postCode}`;
+    const postCodeResponse = await fetch(postCodeUrl);
+    const postCodeData = await postCodeResponse.json();
+
+    const lon = postCodeData.result.longitude;
+    const lat = postCodeData.result.latitude;
+
+    const radius = 200;
+    const stopTypes = "NaptanPublicBusCoachTram";
+    const stopsUrl = `https://api.tfl.gov.uk/StopPoint/?lat=${lat}&lon=${lon}&stopTypes=${stopTypes}&radius=${radius}`
+    const stopsResponse = await fetch(stopsUrl);
+    const stopsData = await stopsResponse.json();
+    const stopIDs = [];
+    
+    for(let i = 0; i < stopsData.stopPoints.length; i++){
+        stopIDs.push(stopsData.stopPoints[i].id)
+    };
+
+    stopIDs.forEach(stopID => getArrivals(stopID));
+    
+    async function getArrivals(stopID) {
+    const arrivalsUrl = `https://api.tfl.gov.uk/StopPoint/${stopID}/Arrivals`
+    const arrivalsResponse = await fetch(arrivalsUrl);
+    const arrivalsData = await arrivalsResponse.json();
+
     const dataArray = [];
     let counter = 0;
 
-        for (let i = 0; i < data.length; i++) {
-           //console.log(`Bus ${data[i].lineName} is arriving in ${data[i].timeToStation} seconds to ${data[i].destinationName}.`)
-           dataArray.push([data[i].lineName, data[i].timeToStation, data[i].destinationName])
+
+        for (let i = 0; i < arrivalsData.length; i++) {
+           //console.log(`Bus ${arrivalsData[i].lineName} is arriving in ${arrivalsData[i].timeToStation} seconds to ${arrivalsData[i].destinationName}.`)
+           dataArray.push([arrivalsData[i].lineName, arrivalsData[i].timeToStation, arrivalsData[i].destinationName])
         
            counter++;
            if (counter === 5){
@@ -35,12 +61,14 @@ async function busBoard() {
     });
 
     dataArray.forEach(element => console.log(`Bus ${element[0]} is arriving in ${element[1]} seconds to ${element[2]}`));
+    }
+    
 
 }
 
 busBoard();
     
 rl.close();
-    console.log(stopCode)
+    console.log(postCode)
   });
 
